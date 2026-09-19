@@ -30,9 +30,11 @@ func (app *application) mount() (*http.Server, error) {
 	// TODO: register domain routes here, e.g.
 	// mux.Handle("/v1/roles/", roles.NewHandler(app.db))
 
+	handler := recoverMiddleware(loggingMiddleware(mux))
+
 	srv := &http.Server{
 		Addr:              app.config.addr,
-		Handler:           mux,
+		Handler:           handler,
 		ReadTimeout:       5 * time.Second,
 		ReadHeaderTimeout: 5 * time.Second,
 		WriteTimeout:      time.Minute,
