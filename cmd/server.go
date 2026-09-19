@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -24,12 +25,26 @@ type application struct {
 func (app *application) mount() (*http.Server, error) {
 	mux := http.NewServeMux()
 
+	mux.HandleFunc("GET /health", app.handleHealth)
+
+	// TODO: register domain routes here, e.g.
+	// mux.Handle("/v1/roles/", roles.NewHandler(app.db))
+
 	srv := &http.Server{
-		Addr:    app.config.addr,
-		Handler: mux,
+		Addr:              app.config.addr,
+		Handler:           mux,
+		ReadTimeout:       5 * time.Second,
+		ReadHeaderTimeout: 5 * time.Second,
+		WriteTimeout:      time.Minute,
+		IdleTimeout:       time.Minute,
+		ErrorLog:          slog.NewLogLogger(slog.Default().Handler(), slog.LevelError),
 	}
 
 	return srv, nil
+}
+
+func (app *application) handleHealth(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
 }
 
 func (app *application) run(srv *http.Server) error {
