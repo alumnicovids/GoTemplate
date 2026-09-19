@@ -3,9 +3,9 @@ package main
 import (
 	"context"
 	"log/slog"
-	"os"
 
 	"github.com/alumnicovids/template-go/pkg/env"
+	"github.com/alumnicovids/template-go/pkg/logger"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -19,7 +19,7 @@ func main() {
 		addr: ":3000",
 	}
 
-	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stdout, nil)))
+	slog.SetDefault(logger.New(env.GetString("LOG_LEVEL", "info"), env.GetString("LOG_FORMAT", "json")))
 
 	pool, err := pgxpool.New(ctx, cfg.dsn)
 	if err != nil {
