@@ -1,6 +1,21 @@
 name: go-template
 
 services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: go-template-app
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: host=database port=5432 user=${POSTGRES_USER:-postgres} password=${POSTGRES_PASSWORD:-postgres} dbname=${POSTGRES_DB:-myapp} sslmode=disable
+    ports:
+      - ${PORT:-3000}:${PORT:-3000}
+    depends_on:
+      database:
+        condition: service_healthy
+
   database:
     image: postgres:16-alpine
     container_name: go-template-postgres

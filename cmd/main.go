@@ -16,7 +16,7 @@ func main() {
 
 	cfg := config{
 		dsn:  env.GetString("DATABASE_URL", defaultDSN),
-		addr: ":3000",
+		addr: ":" + env.GetString("PORT", "3000"),
 	}
 
 	slog.SetDefault(logger.New(env.GetString("LOG_LEVEL", "info"), env.GetString("LOG_FORMAT", "json")))

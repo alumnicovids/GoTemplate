@@ -46,6 +46,11 @@ func (app *application) mount() (*http.Server, error) {
 }
 
 func (app *application) handleHealth(w http.ResponseWriter, r *http.Request) {
+	if err := app.db.Ping(r.Context()); err != nil {
+		slog.Error("health check: database ping failed", "error", err)
+		w.WriteHeader(http.StatusServiceUnavailable)
+		return
+	}
 	w.WriteHeader(http.StatusOK)
 }
 
